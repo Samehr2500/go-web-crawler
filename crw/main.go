@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
+	"time"
 
 	crawler "crawler/crawler"
 )
@@ -17,16 +18,22 @@ func main() {
 	fmt.Println("NumCPU", runtime.NumCPU())          //4
 	fmt.Println("GOMAXPROCS", runtime.GOMAXPROCS(0)) //4
 
-	limit_just := -1 // -1 is all
+	limit_just := 100 // -1 is all
 
 	crawler.GetPaperLinks(limit_just)
 
 	size := crawler.GetLengthPaperLinks()
 	fmt.Println("found ", size, " links")
 
-	divisor := 4
+	divisor := 3
 	sizeOfList := int(size) / divisor
-	for i := 0; i < sizeOfList; i++ {
+	threads := 0
+	if sizeOfList < 2 {
+		threads = 1
+	} else if sizeOfList > 2 {
+		threads = divisor
+	}
+	for i := 0; i < threads; i++ {
 		Wg.Add(1)
 		if (divisor - i) == 1 { //if is the last iteration, take care of summing the remainder
 			go crawler.GetInfoFromURL(crawler.PopPaperLinks(sizeOfList+(int(size)%divisor)), &Wg)
@@ -59,4 +66,5 @@ func main() {
 	}
 
 	fmt.Println("\n.. FINISHED .. ")
+	time.Sleep(1000000)
 }

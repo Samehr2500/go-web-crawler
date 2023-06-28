@@ -37,7 +37,7 @@ func GetPaperLinks(limit int) {
 	}
 
 	rdb, ctx := driver.CreateRedisConnection()
-
+	defer rdb.Close()
 	// delete any existing list with the same name
 	err = rdb.Del(ctx, papersLinks).Err()
 	if err != nil {
@@ -116,6 +116,7 @@ func GetInfoFromURL(urls []string, Wg *sync.WaitGroup) {
 			panic(err)
 		}
 		rdb, ctx := driver.CreateRedisConnection()
+		defer rdb.Close()
 		// append the JSON object to the end of a list
 		err = rdb.RPush(ctx, papersData, string(jsonPaperInfo)).Err()
 		if err != nil {
@@ -133,7 +134,7 @@ func checkError(err error, url string) {
 
 func GetLengthPaperLinks() int64 {
 	rdb, ctx := driver.CreateRedisConnection()
-
+	defer rdb.Close()
 	len, err := rdb.LLen(ctx, papersLinks).Result()
 	if err != nil {
 		panic(err)
@@ -144,7 +145,7 @@ func GetLengthPaperLinks() int64 {
 
 func GetLengthPapersInfo() int64 {
 	rdb, ctx := driver.CreateRedisConnection()
-
+	defer rdb.Close()
 	len, err := rdb.LLen(ctx, papersData).Result()
 	if err != nil {
 		panic(err)
@@ -155,6 +156,7 @@ func GetLengthPapersInfo() int64 {
 
 func PopPaperLinks(size int) []string {
 	rdb, ctx := driver.CreateRedisConnection()
+	defer rdb.Close()
 	var urls []string
 
 	for j := 0; j < size; j++ {
@@ -170,6 +172,7 @@ func PopPaperLinks(size int) []string {
 
 func PopPaperInfo() PapersInfo {
 	rdb, ctx := driver.CreateRedisConnection()
+	defer rdb.Close()
 	var info PapersInfo
 
 	// pop a JSON string from the Redis list

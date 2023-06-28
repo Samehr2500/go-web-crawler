@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// CreateDBConnection with postgres db
+// CreateRedisConnection with postgres db
 func CreateRedisConnection() (*redis.Client, context.Context) {
 	ctx := context.Background()
 	// create a Redis client
